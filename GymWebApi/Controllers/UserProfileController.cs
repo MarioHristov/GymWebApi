@@ -1,4 +1,5 @@
 ﻿using GymWebApi.Model;
+using GymWebApi.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace GymWebApi.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpPost]
+        [HttpPost("CreateUser")]
         public async Task<IResult> CreateUser([FromBody] JsonElement userCredentials)
         {
             var email = userCredentials.GetProperty("email").GetString();
@@ -35,9 +36,23 @@ namespace GymWebApi.Controllers
                     Password = password
                 }
             };
-            var res = await registerModel.OnPostAsync();
-            Console.WriteLine(res);
-            return res ;
+            return await registerModel.OnPostAsync();
+        }
+        [HttpPost("LogUser")]
+        public async Task<IResult> LogUser([FromBody] JsonElement userCredentials)
+        {
+            var email = userCredentials.GetProperty("email").GetString();
+            var password = userCredentials.GetProperty("password").GetString();
+
+            var loginModel = new LoginModel(_signInManager)
+            {
+                Input = new LoginModel.InputModel
+                {
+                    Email = email,
+                    Password = password
+                }
+            };
+            return await loginModel.OnGetAsync();
         }
     }
 }
